@@ -19,8 +19,12 @@ const controller = {
 
     // تحديث كل أجزاء الواجهة
     updateAllViews() {
-        const questions = model.getFilteredQuestions();
-        view.renderQuestions(questions);
+        const paginatedQuestions = model.getPaginatedQuestions();
+        const totalPages = model.getTotalPages();
+        
+        view.renderQuestions(paginatedQuestions);
+        view.renderPagination(model.currentPage, totalPages);
+        
         view.updateActiveFilter(model.currentFilter);
         view.renderDifficultyChart(model.getChartData());
         view.renderMasteryChart(model.getMasteryStats());
@@ -49,62 +53,70 @@ const controller = {
             else if (copyCodeBtn) this.handleCopyCodeClick(copyCodeBtn);
         });
         view.theme.toggle.addEventListener('click', () => this.handleThemeToggle());
+        
+        // مستمع أحداث جديد للتحكم بالصفحات
+        view.paginationControls.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON' && e.target.dataset.page) {
+                this.handlePageChange(parseInt(e.target.dataset.page));
+            }
+        });
+    },
+
+    // التعامل مع تغيير الصفحة
+    handlePageChange(newPage) {
+        model.currentPage = newPage;
+        const paginatedQuestions = model.getPaginatedQuestions();
+        const totalPages = model.getTotalPages();
+        
+        view.renderQuestions(paginatedQuestions);
+        view.renderPagination(model.currentPage, totalPages);
+        window.scrollTo({ top: view.grid.offsetTop - 20, behavior: 'smooth' });
     },
 
     // التعامل مع ضغط أزرار الفلترة
     handleFilterClick(filterValue) {
         model.currentFilter = filterValue;
+        model.currentPage = 1; // إعادة التعيين إلى الصفحة الأولى عند تغيير الفلتر
         this.updateAllViews();
     },
 
     // التعامل مع إدخال البحث
     handleSearchInput(term) {
         model.searchTerm = term;
-        view.renderQuestions(model.getFilteredQuestions());
+        model.currentPage = 1; // إعادة التعيين إلى الصفحة الأولى عند البحث
+        this.updateAllViews();
     },
 
-    // التعامل مع فتح/إغلاق الإجابة
+    // باقي الدوال تبقى كما هي مع تعديلات بسيطة
     handleExpandClick(expandButton) {
         const card = expandButton.closest('.question-card');
         if(card) view.toggleAnswer(card);
     },
-
-    // التعامل مع نسخ السؤال
     handleCopyClick(copyButton) {
         const card = copyButton.closest('.question-card');
         const questionText = card.querySelector('.question-text').innerText;
         this.copyToClipboard(questionText, 'تم نسخ السؤال بنجاح!');
     },
-
-    // التعامل مع نسخ الكود
     handleCopyCodeClick(copyCodeButton) {
         const pre = copyCodeButton.closest('pre');
         const code = pre.querySelector('code').innerText;
         this.copyToClipboard(code, 'تم نسخ الكود بنجاح!');
     },
-
-    // التعامل مع تمييز سؤال كمتقن
-    async handleMasteredClick(masteredButton) {
+    handleMasteredClick(masteredButton) {
         const card = masteredButton.closest('.question-card');
         const questionId = card.dataset.questionId;
-        
-        await model.toggleMastered(questionId); 
-
+        model.toggleMastered(questionId);
         masteredButton.classList.toggle('mastered');
         card.classList.toggle('border-yellow-400');
         view.updateMasteredCounter(model.getMasteredCount(), model.questions.length);
         view.renderMasteryChart(model.getMasteryStats());
     },
-
-    // التعامل مع تبديل الوضع
     handleThemeToggle() {
         const isDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
         view.toggleTheme(isDark);
-        this.updateAllViews(); // Re-render charts for new colors
+        this.updateAllViews(); 
     },
-
-    // وظيفة النسخ إلى الحافظة
     copyToClipboard(text, message) {
         const textArea = document.createElement("textarea");
         textArea.value = text;

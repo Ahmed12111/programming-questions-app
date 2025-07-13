@@ -19,22 +19,44 @@ const db = firebase.firestore(); // تهيئة Firestore
 export const model = {
     currentFilter: 'all',
     searchTerm: '',
+    currentPage: 1,
+    itemsPerPage: 12,
     questions: [],
     
     // تحميل الأسئلة من Firestore
     async loadQuestions() {
         try {
+            // استعادة حالة الإتقان من الذاكرة المحلية
+            const masteredState = JSON.parse(localStorage.getItem('masteredQuestions')) || {};
+            
             const snapshot = await db.collection('questions').get();
-            this.questions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            this.questions = snapshot.docs.map(doc => {
+                const questionData = doc.data();
+                return { 
+                    id: doc.id, 
+                    ...questionData,
+                    // دمج حالة الإتقان المحفوظة
+                    mastered: masteredState[doc.id] || false 
+                };
+            });
         } catch (error) {
             console.error("Error loading questions from Firebase:", error);
-            // يمكنك هنا عرض رسالة خطأ للمستخدم
-            this.questions = []; // إفراغ الأسئلة في حالة حدوث خطأ
+            this.questions = [];
         }
     },
 
-    // فلترة الأسئلة
-    getFilteredQuestions() {
+    // حفظ حالة الإتقان في الذاكرة المحلية
+    saveMasteryState() {
+        const masteredState = {};
+        this.questions.forEach(q => {
+            if (q.mastered) {
+                masteredState[q.id] = true;
+            }
+        });
+        localStorage.setItem('masteredQuestions', JSON.stringify(masteredState));
+    },
+
+    _getFilteredAndSearchedQuestions() {
         let questions = this.questions;
         if (this.currentFilter !== 'all') {
              questions = questions.filter(q => q.difficulty === this.currentFilter);
@@ -49,7 +71,18 @@ export const model = {
         return questions;
     },
 
-    // الحصول على بيانات مخطط التوزيع
+    getPaginatedQuestions() {
+        const filteredQuestions = this._getFilteredAndSearchedQuestions();
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        return filteredQuestions.slice(startIndex, endIndex);
+    },
+
+    getTotalPages() {
+        const totalQuestions = this._getFilteredAndSearchedQuestions().length;
+        return Math.ceil(totalQuestions / this.itemsPerPage);
+    },
+
     getChartData() {
         return {
             easy: this.questions.filter(q => q.difficulty === 'easy').length,
@@ -58,7 +91,6 @@ export const model = {
         }
     },
 
-    // الحصول على إحصائيات الإتقان
     getMasteryStats() {
         const stats = {
             easy: { mastered: 0, total: 0 },
@@ -76,23 +108,14 @@ export const model = {
         return stats;
     },
 
-    // تغيير حالة الإتقان في Firestore
-    async toggleMastered(id) {
-        const questionRef = db.collection('questions').doc(id);
+    toggleMastered(id) {
         const question = this.questions.find(q => q.id === id);
         if (question) {
-            const newMasteredState = !question.mastered;
-            try {
-                await questionRef.update({ mastered: newMasteredState });
-                // تحديث الحالة محليًا لتجنب إعادة تحميل كل البيانات
-                question.mastered = newMasteredState;
-            } catch (error) {
-                console.error("Error updating mastery state:", error);
-            }
+            question.mastered = !question.mastered;
+            this.saveMasteryState(); // حفظ الحالة الجديدة في الذاكرة المحلية
         }
     },
 
-    // الحصول على عدد الأسئلة المتقنة
     getMasteredCount() {
         return this.questions.filter(q => q.mastered).length;
     }

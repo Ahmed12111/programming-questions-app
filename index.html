@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة أسئلة البرمجة التفاعلية</title>
+    <title>منصة أسئلة برمجية عامة تفاعلية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,9 +13,8 @@
 </head>
 <body>
 
-    <div class="container mx-auto px-4 py-8 md:py-12">
-
-        <header class="text-center mb-6">
+    <header class="header-bg py-4 shadow-sm">
+        <div class="container mx-auto px-4">
             <div class="relative flex justify-center items-center">
                 <h1 class="text-3xl md:text-5xl font-bold">منصة أسئلة برمجية عامة تفاعلية</h1>
                 <div class="absolute right-0 top-1/2 -translate-y-1/2">
@@ -25,58 +24,63 @@
                     </button>
                 </div>
             </div>
-            <p class="mt-2 text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">رفيقك الدراسي لاحتراف البرمجة بأسلوب عصري ومحفز.</p>
-        </header>
+            <p class="text-center mt-2 text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">رفيقك الدراسي لاحتراف البرمجة بأسلوب عصري ومحفز.</p>
+        </div>
+    </header>
 
-        <main>
-            <section id="dashboard" class="mb-12 glass-card p-6 md:p-8 shadow-md">
-                <h2 class="text-2xl font-bold text-center mb-4">لوحة المعلومات</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                    <div class="chart-container">
-                        <canvas id="difficultyChart"></canvas>
-                        <p class="text-center text-sm text-slate-500 dark:text-slate-400 mt-2">توزيع الأسئلة</p>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="masteryChart"></canvas>
-                        <p class="text-center text-sm text-slate-500 dark:text-slate-400 mt-2">تحليل مستوى الإتقان (٪)</p>
-                    </div>
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        <section id="dashboard" class="mb-12 glass-card p-6 md:p-8 shadow-md">
+            <h2 class="text-2xl font-bold text-center mb-4">لوحة المعلومات</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="chart-container">
+                    <canvas id="difficultyChart"></canvas>
+                    <p class="text-center text-sm text-slate-500 dark:text-slate-400 mt-2">توزيع الأسئلة</p>
                 </div>
-                 <div class="text-center mt-8">
-                    <h3 class="text-lg font-bold mb-2">إجمالي الإنجاز</h3>
-                    <div id="mastered-counter" class="text-5xl font-bold text-[var(--accent-color)]">0 / 0</div>
+                <div class="chart-container">
+                    <canvas id="masteryChart"></canvas>
+                    <p class="text-center text-sm text-slate-500 dark:text-slate-400 mt-2">تحليل مستوى الإتقان (٪)</p>
                 </div>
-            </section>
+            </div>
+             <div class="text-center mt-8">
+                <h3 class="text-lg font-bold mb-2">إجمالي الإنجاز</h3>
+                <div id="mastered-counter" class="text-5xl font-bold text-[var(--accent-color)]">0 / 0</div>
+            </div>
+        </section>
 
-            <section id="questions-section" aria-labelledby="questions-heading">
-                <h2 id="questions-heading" class="text-2xl font-bold text-center mb-4">استكشف الأسئلة</h2>
-                <div class="max-w-xl mx-auto mb-10">
-                    <div class="relative">
-                         <input type="search" id="search-input" placeholder="ابحث عن سؤال..." class="w-full p-3 pr-10 border border-slate-300 dark:border-slate-700 rounded-full bg-[var(--input-bg-light)] focus:ring-2 focus:ring-emerald-500 focus:outline-none transition shadow-sm" aria-label="ابحث عن سؤال">
-                         <div class="absolute top-1/2 right-4 -translate-y-1/2 text-slate-400">
-                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                         </div>
-                    </div>
-                    <div id="filters" class="flex justify-center flex-wrap gap-3 md:gap-4 mt-4 p-2 bg-slate-900/5 rounded-full max-w-md mx-auto">
-                        <button data-filter="all" class="btn-filter px-4 py-2 rounded-full text-sm">الكل</button>
-                        <button data-filter="easy" class="btn-filter px-4 py-2 rounded-full text-sm">سهل</button>
-                        <button data-filter="medium" class="btn-filter px-4 py-2 rounded-full text-sm">متوسط</button>
-                        <button data-filter="hard" class="btn-filter px-4 py-2 rounded-full text-sm">صعب</button>
-                    </div>
+        <section id="questions-section" aria-labelledby="questions-heading">
+            <h2 id="questions-heading" class="text-2xl font-bold text-center mb-4">استكشف الأسئلة</h2>
+            <div class="max-w-xl mx-auto mb-10">
+                <div class="relative">
+                     <input type="search" id="search-input" placeholder="ابحث عن سؤال..." class="w-full p-3 pr-10 border border-slate-300 dark:border-slate-700 rounded-full bg-[var(--input-bg-light)] focus:ring-2 focus:ring-emerald-500 focus:outline-none transition shadow-sm" aria-label="ابحث عن سؤال">
+                     <div class="absolute top-1/2 right-4 -translate-y-1/2 text-slate-400">
+                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                     </div>
                 </div>
-
-                <div id="questions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div id="filters" class="flex justify-center flex-wrap gap-3 md:gap-4 mt-4 p-2 bg-slate-900/5 rounded-full max-w-md mx-auto">
+                    <button data-filter="all" class="btn-filter px-4 py-2 rounded-full text-sm">الكل</button>
+                    <button data-filter="easy" class="btn-filter px-4 py-2 rounded-full text-sm">سهل</button>
+                    <button data-filter="medium" class="btn-filter px-4 py-2 rounded-full text-sm">متوسط</button>
+                    <button data-filter="hard" class="btn-filter px-4 py-2 rounded-full text-sm">صعب</button>
                 </div>
-            </section>
-        </main>
+            </div>
 
-        <footer class="text-center mt-16 pt-8 border-t border-slate-900/10">
+            <div id="questions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[300px]">
+            </div>
+
+            <div id="pagination-controls" class="flex justify-center items-center gap-2 md:gap-4 mt-12">
+                <!-- سيتم إضافة أزرار التحكم هنا بواسطة JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer-bg mt-16">
+        <div class="container mx-auto px-4 py-6 text-center">
             <p class="text-slate-500 dark:text-slate-400">Made with ❤️ by Ahmed © 2025</p>
-        </footer>
-        
-        <div id="toast-notification" class="toast-notification"></div>
-        
-    </div>
-
+        </div>
+    </footer>
+    
+    <div id="toast-notification" class="toast-notification"></div>
+    
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>

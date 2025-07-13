@@ -3,6 +3,7 @@
 export const view = {
     grid: document.getElementById('questions-grid'),
     filtersContainer: document.getElementById('filters'),
+    paginationControls: document.getElementById('pagination-controls'),
     difficultyChartCanvas: document.getElementById('difficultyChart'),
     masteryChartCanvas: document.getElementById('masteryChart'),
     masteredCounter: document.getElementById('mastered-counter'),
@@ -18,14 +19,13 @@ export const view = {
         hard: { badge: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/50 dark:text-rose-300 dark:border-rose-700', name: 'صعب' }
     },
     
-    // عرض الأسئلة على الشاشة
     renderQuestions(questions) {
         this.grid.innerHTML = '';
         if (questions.length === 0) {
             this.grid.innerHTML = `<p class="text-center text-slate-500 dark:text-slate-400 col-span-full">لا توجد أسئلة تطابق بحثك.</p>`;
             return;
         }
-        questions.forEach((q, index) => {
+        questions.forEach((q) => {
             const card = document.createElement('div');
             card.className = `question-card glass-card p-6 shadow-lg flex flex-col ${q.mastered ? 'border-yellow-400' : ''}`;
             card.dataset.questionId = q.id;
@@ -65,19 +65,44 @@ export const view = {
         });
     },
 
-    // فتح وإغلاق الإجابة
+    renderPagination(currentPage, totalPages) {
+        this.paginationControls.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        const prevButton = document.createElement('button');
+        prevButton.className = 'pagination-btn';
+        prevButton.textContent = 'السابق';
+        prevButton.dataset.page = currentPage - 1;
+        prevButton.disabled = currentPage === 1;
+        this.paginationControls.appendChild(prevButton);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.className = 'pagination-btn';
+            pageButton.textContent = i;
+            pageButton.dataset.page = i;
+            if (i === currentPage) {
+                pageButton.classList.add('active');
+            }
+            this.paginationControls.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement('button');
+        nextButton.className = 'pagination-btn';
+        nextButton.textContent = 'التالي';
+        nextButton.dataset.page = currentPage + 1;
+        nextButton.disabled = currentPage === totalPages;
+        this.paginationControls.appendChild(nextButton);
+    },
+
     toggleAnswer(cardElement) {
         cardElement.classList.toggle('card-open');
         const answer = cardElement.querySelector('.answer');
         if (answer) answer.classList.toggle('visible');
     },
-
-    // تحديث عداد الإنجاز
     updateMasteredCounter(count, total) {
         this.masteredCounter.textContent = `${count} / ${total}`;
     },
-
-    // إظهار إشعار مؤقت
     showToast(message) {
         this.toast.textContent = message;
         this.toast.classList.add('show');
@@ -85,15 +110,11 @@ export const view = {
             this.toast.classList.remove('show');
         }, 2500);
     },
-
-    // تحديث الفلتر النشط
     updateActiveFilter(filterValue) {
         this.filtersContainer.querySelectorAll('.btn-filter').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.filter === filterValue);
         });
     },
-
-    // عرض مخطط توزيع الصعوبة
     renderDifficultyChart(chartData) {
         const chartInstance = Chart.getChart(this.difficultyChartCanvas);
         if (chartInstance) chartInstance.destroy();
@@ -122,8 +143,6 @@ export const view = {
             }
         });
     },
-
-    // عرض مخطط تحليل الإتقان
     renderMasteryChart(stats) {
         const chartInstance = Chart.getChart(this.masteryChartCanvas);
         if (chartInstance) chartInstance.destroy();
@@ -180,8 +199,6 @@ export const view = {
             }
         });
     },
-
-    // تبديل الوضع الليلي/الفاتح
     toggleTheme(isDark) {
          this.theme.sunIcon.classList.toggle('hidden', isDark);
          this.theme.moonIcon.classList.toggle('hidden', !isDark);

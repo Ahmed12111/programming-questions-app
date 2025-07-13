@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Firebase Seeder</title>
+</head>
+<body>
+    <h1>Data Seeding in Progress...</h1>
+    <p>Check the console for progress.</p>
+    <button id="start-seeding">Start Seeding</button>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+
+    <script>
+        // !! هام جدًا: استبدل هذا الكائن بمعلومات مشروعك من Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVTr26WP9CllJ--o_DovsXik-vJTXIwZI",
+            authDomain: "programming-questions-app.firebaseapp.com",
+            projectId: "programming-questions-app",
+            storageBucket: "programming-questions-app.firebasestorage.app",
+            messagingSenderId: "811853082874",
+            appId: "1:811853082874:web:439bd481db70e92f79d943",
+            measurementId: "G-2MS42KRMLN"
+        };
+        
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const questionsCollection = db.collection('questions');
+
+        // دالة لرفع البيانات
+        async function seedDatabase() {
+            try {
+                // 1. جلب البيانات من ملف JSON
+                const response = await fetch('questions.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const questions = await response.json();
+                console.log(`Found ${questions.length} questions in JSON file.`);
+
+                // 2. رفع كل سؤال إلى Firestore
+                for (const question of questions) {
+                    await questionsCollection.add(question);
+                    console.log(`Successfully added: "${question.question.substring(0, 30)}..."`);
+                }
+
+                console.log('🎉 --- Seeding Complete! --- 🎉');
+                alert('Data seeding complete! All questions have been uploaded to Firebase.');
+
+            } catch (error) {
+                // --- التعديل هنا ---
+                // سيعرض هذا الكود الخطأ الكامل في الكونسول ورسالة واضحة في التنبيه
+                console.error('Firebase Seeding Error:', error);
+                alert(`An error occurred. Check the console for details. Error message: ${error.message}`);
+            }
+        }
+
+        document.getElementById('start-seeding').addEventListener('click', () => {
+            if (confirm('Are you sure you want to seed the database? This will add all questions from the JSON file.')) {
+                seedDatabase();
+            }
+        });
+    </script>
+</body>
+</html>

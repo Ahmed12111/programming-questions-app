@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة أسئلة البرمجة التفاعلية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+
+        <header class="text-center mb-6">
+            <div class="relative flex justify-center items-center">
+                <h1 class="text-3xl md:text-5xl font-bold">منصة أسئلة البرمجة</h1>
+                <div class="absolute right-0 top-1/2 -translate-y-1/2">
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="تبديل الوضع" aria-label="تبديل الوضع">
+                        <svg id="theme-icon-sun" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                        <svg id="theme-icon-moon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                    </button>
+                </div>
+            </div>
+            <p class="mt-2 text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">رفيقك الدراسي لاحتراف البرمجة بأسلوب عصري ومحفز.</p>
+        </header>
+
+        <main>
+            <section id="dashboard" class="mb-12 glass-card p-6 md:p-8 shadow-md">
+                <h2 class="text-2xl font-bold text-center mb-4">لوحة المعلومات</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="chart-container">
+                        <canvas id="difficultyChart"></canvas>
+                        <p class="text-center text-sm text-slate-500 dark:text-slate-400 mt-2">توزيع الأسئلة</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="masteryChart"></canvas>
+                        <p class="text-center text-sm text-slate-500 dark:text-slate-400 mt-2">تحليل مستوى الإتقان (٪)</p>
+                    </div>
+                </div>
+                 <div class="text-center mt-8">
+                    <h3 class="text-lg font-bold mb-2">إجمالي الإنجاز</h3>
+                    <div id="mastered-counter" class="text-5xl font-bold text-[var(--accent-color)]">0 / 0</div>
+                </div>
+            </section>
+
+            <section id="questions-section" aria-labelledby="questions-heading">
+                <h2 id="questions-heading" class="text-2xl font-bold text-center mb-4">استكشف الأسئلة</h2>
+                <div class="max-w-xl mx-auto mb-10">
+                    <div class="relative">
+                         <input type="search" id="search-input" placeholder="ابحث عن سؤال..." class="w-full p-3 pr-10 border border-slate-300 dark:border-slate-700 rounded-full bg-[var(--input-bg-light)] focus:ring-2 focus:ring-emerald-500 focus:outline-none transition shadow-sm" aria-label="ابحث عن سؤال">
+                         <div class="absolute top-1/2 right-4 -translate-y-1/2 text-slate-400">
+                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                         </div>
+                    </div>
+                    <div id="filters" class="flex justify-center flex-wrap gap-3 md:gap-4 mt-4 p-2 bg-slate-900/5 rounded-full max-w-md mx-auto">
+                        <button data-filter="all" class="btn-filter px-4 py-2 rounded-full text-sm">الكل</button>
+                        <button data-filter="easy" class="btn-filter px-4 py-2 rounded-full text-sm">سهل</button>
+                        <button data-filter="medium" class="btn-filter px-4 py-2 rounded-full text-sm">متوسط</button>
+                        <button data-filter="hard" class="btn-filter px-4 py-2 rounded-full text-sm">صعب</button>
+                    </div>
+                </div>
+
+                <div id="questions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-16 pt-8 border-t border-slate-900/10">
+            <p class="text-slate-500 dark:text-slate-400">Made with ❤️ by Ahmed © 2025</p>
+        </footer>
+        
+        <div id="toast-notification" class="toast-notification"></div>
+        
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+
+    <!-- Your Scripts -->
+    <script type="module" src="js/controller.js"></script>
+</body>
+</html>
